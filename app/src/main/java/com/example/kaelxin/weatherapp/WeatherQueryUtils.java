@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public final class WeatherQueryUtils {
@@ -68,7 +69,7 @@ public final class WeatherQueryUtils {
             String time = jsonObjectResponse.getString("dt");
             if (time != null) {
                 Date convertedTime = new java.util.Date(Integer.parseInt(time) * 1000L);
-                SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+                SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
                 simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT-4"));
                 formatedTime = simpleDateFormat.format(convertedTime);
             }
