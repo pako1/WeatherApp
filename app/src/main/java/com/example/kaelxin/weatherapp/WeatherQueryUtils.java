@@ -21,17 +21,19 @@ import java.util.TimeZone;
 
 public final class WeatherQueryUtils {
 
-    // https://openweathermap.org/current
-    // ftiaxneis http://samples.openweathermap.org/data/2.5/weather?q=London,uk&appid=b6907d289e10d714a6e88b30761fae22
-    // opou 8a pairneis ta dedomena apo mia polh kai mono kai apo ayth 8a emfanizeis kapoia sigkekrimena pragmata !!
-    // https://www.androidcentral.com/best-weather-apps-android
-    // akolou8eis ayto to pragma.
+    /*
+    https://openweathermap.org/current
+    ftiaxneis http://samples.openweathermap.org/data/2.5/weather?q=London,uk&appid=b6907d289e10d714a6e88b30761fae22
+    opou 8a pairneis ta dedomena apo mia polh kai mono kai apo ayth 8a emfanizeis kapoia sigkekrimena pragmata !!
+    https://www.androidcentral.com/best-weather-apps-android
+    akolou8eis ayto to pragma.
+    */
 
 
     private WeatherQueryUtils() {
     }
 
-    public static List<Weather> fetchData(String response) {
+    public static Weather fetchData(String response) {
 
         URL url = createUrl(response);
         String jsonResponse = null;
@@ -46,9 +48,9 @@ public final class WeatherQueryUtils {
         return fetchJson(jsonResponse);
     }
 
-    private static List<Weather> fetchJson(String jsonResponse) {
+    private static Weather fetchJson(String jsonResponse) {
 
-        List<Weather> weatherList = new ArrayList<>();
+        Weather weather = null;
 
         try {
             JSONObject jsonObjectResponse = new JSONObject(jsonResponse);
@@ -59,12 +61,14 @@ public final class WeatherQueryUtils {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonWeatherObject = jsonArray.getJSONObject(i);
                 weatherCondition = jsonWeatherObject.getString("main");
-                weatherIcon = jsonWeatherObject.getString("09d");
+                weatherIcon = jsonWeatherObject.getString("icon");
             }
-            String currentTemp = jsonObjectResponse.getString("temp");
-            String minTemp = jsonObjectResponse.getString("temp_min");
-            String maxTemp = jsonObjectResponse.getString("temp_max");
-            String windspeed = jsonObjectResponse.getString("speed");
+            JSONObject mainObject = jsonObjectResponse.getJSONObject("main");
+            String currentTemp = mainObject.getString("temp");
+            String minTemp = mainObject.getString("temp_min");
+            String maxTemp = mainObject.getString("temp_max");
+            JSONObject windObject = jsonObjectResponse.getJSONObject("wind");
+            String windspeed = windObject.getString("speed");
             String location = jsonObjectResponse.getString("name");
             String time = jsonObjectResponse.getString("dt");
             if (time != null) {
@@ -74,13 +78,12 @@ public final class WeatherQueryUtils {
                 formatedTime = simpleDateFormat.format(convertedTime);
             }
 
-            Weather weather = new Weather(weatherIcon, weatherCondition, formatedTime, maxTemp, minTemp, currentTemp, windspeed, location);
-            weatherList.add(weather);
+            weather = new Weather(weatherIcon, weatherCondition, formatedTime, maxTemp, minTemp, currentTemp, windspeed, location);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return weatherList;
+        return weather;
     }
 
     private static String makeHttpConnection(URL url) throws IOException {
